@@ -2,16 +2,23 @@ import { QuizQuestion } from "@/utils/types";
 import { createContext, useRef, useState } from "react";
 
 export type DataStore = {
-  questions: QuizQuestion[];
+  questions: { [key: number]: QuizQuestion };
   currentQuestion: number;
-  setQuestions: (questions: QuizQuestion[]) => void;
+  setQuestions: (questions: { [key: number]: QuizQuestion }) => void;
   setCurrentQuestion: (currentQuestion: number) => void;
-  answers: { current: { answer: string; isCorrect: boolean }[] | undefined };
-  setAnswers: (answer: { answer: string; isCorrect: boolean }) => void;
+  answers: {
+    current:
+      | { [key: number]: { answer: string; isCorrect: boolean } }
+      | undefined;
+  };
+  setAnswers: (
+    questionId: string | number,
+    answer: { answer: string; isCorrect: boolean }
+  ) => void;
 };
 
 export const DataStoreContext = createContext<DataStore>({
-  questions: [],
+  questions: {},
   currentQuestion: 0,
   setQuestions: () => {},
   setCurrentQuestion: () => {},
@@ -24,16 +31,20 @@ export const DataStoreProvider = ({
 }: {
   children: React.ReactNode;
 }) => {
-  const [questions, setQuestions] = useState<QuizQuestion[]>([]);
+  const [questions, setQuestions] = useState<{ [key: number]: QuizQuestion }>(
+    {}
+  );
   const [currentQuestion, setCurrentQuestion] = useState<number>(0);
-  const answers = useRef<{ answer: string; isCorrect: boolean }[]>([]);
+  const answers = useRef<{ answer: string; isCorrect: boolean }[]>({});
 
-  const onAnswersChange = (answer: { answer: string; isCorrect: boolean }) => {
-    answers.current = [...answers.current, answer];
-    console.log("in context", answers.current);
+  const onAnswersChange = (
+    id: number,
+    answer: { answer: string; isCorrect: boolean }
+  ) => {
+    answers.current[id] = answer;
   };
 
-  const onQuestionsChange = (newQuestions: QuizQuestion[]) => {
+  const onQuestionsChange = (newQuestions: { [key: number]: QuizQuestion }) => {
     setQuestions(newQuestions);
   };
 

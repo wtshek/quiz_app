@@ -1,83 +1,46 @@
-import { useCallback, useEffect, useState } from "react";
-import { Timer } from "@/components/Timer";
-import { cn } from "@/utils/lib";
 import { useNavigate, useParams } from "react-router-dom";
 import { useDataStore } from "@/context/useDataStore";
 import { PATH } from "@/utils/const";
+import { useEffect } from "react";
+import { Question as QuestionComponent } from "@/components/Question";
+
+// TODO: add modal showing You Are Correct!
 
 export const Question = () => {
   const { questions, setAnswers } = useDataStore();
-  const { questionId } = useParams();
-  const { imageUrl, question, options, time, answer } =
-    questions?.[Number(questionId) || 0] || {};
-  const [selectedAnswer, setSelectedAnswer] = useState<string | undefined>(
-    undefined
-  );
-  const answerInString = options?.[answer || 0];
   const navigate = useNavigate();
+  const { questionId } = useParams();
+  const question = questions[Number(questionId)];
 
   useEffect(() => {
-    if (!questions || questions?.length === 0) navigate(PATH.HOME);
+    if (!questions || Object.values(questions)?.length === 0)
+      navigate(PATH.HOME);
   }, [questions, navigate]);
 
-  const onFinished = () => {
-    console.log("onFinished");
-  };
-
-  const onAnswerSelected = (answer: string) => () => {
-    setSelectedAnswer(answer);
-    setAnswers({ answer, isCorrect: answer === answerInString });
-  };
-
-  const onNextQuestionButtonClicked = useCallback(() => {
+  const onNextQuestionButtonClicked = () => {
     const to =
-      Number(questionId) + 1 <= questions.length - 1
+      Number(questionId) + 1 <= Object.values(questions).length - 1
         ? `${PATH.QUESTION}/${Number(questionId) + 1}`
         : PATH.RESULT;
     navigate(to);
-  }, [questionId, navigate, questions.length]);
+  };
+
+  const onTimerFinished = (answer: string | undefined) => {
+    const answerString = question.options[question.answer];
+    setAnswers(String(questionId), {
+      answer: answer || "",
+      isCorrect: answer === answerString,
+    });
+  };
 
   return (
     <div>
-      <Timer
-        time={time || 0}
-        onFinish={onFinished}
-        containerClass="absolute right-4 top-4 object-contain"
+      <QuestionComponent
+        onNextButtonClicked={onNextQuestionButtonClicked}
+        question={question}
+        onTimerFinished={onTimerFinished}
+        key={questionId}
       />
-      <img src={imageUrl} />
-      <div className="px-4 flex flex-col">
-        <div className="text-4xl font-bold">{question}</div>
-        <div className="grid grid-cols-2 gap-4 mt-4">
-          {options?.map((option) => (
-            <button
-              className={cn(
-                "border-2 rounded-md p-2 flex items-center justify-center text-center text-xl",
-                {
-                  "border-green-700":
-                    option === selectedAnswer &&
-                    selectedAnswer === answerInString,
-                  "border-red-700":
-                    option === selectedAnswer &&
-                    selectedAnswer !== undefined &&
-                    selectedAnswer !== answerInString,
-                }
-              )}
-              onClick={onAnswerSelected(option)}
-              key={option}
-            >
-              {option}
-            </button>
-          ))}
-        </div>
-        {selectedAnswer !== undefined && (
-          <button
-            className="mt-8 self-end"
-            onClick={onNextQuestionButtonClicked}
-          >
-            Next Question
-          </button>
-        )}
-      </div>
     </div>
   );
 };

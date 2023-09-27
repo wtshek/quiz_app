@@ -21,13 +21,11 @@ export const Timer: FC<TimerProps> = ({
   useEffect(() => {
     const interval = setInterval(() => {
       setSeconds((prevSeconds) => (prevSeconds <= 0 ? 0 : prevSeconds - 1));
-
       if (seconds === 0) {
         clearInterval(interval);
         onFinish();
       }
     }, 1000);
-
     return () => clearInterval(interval);
   }, [seconds, onFinish]);
 

@@ -10,19 +10,18 @@ export const Home = () => {
   const navigation = useNavigate();
 
   useEffect(() => {
-    if (questions?.length) return;
+    if (Object.values(questions)?.length) return;
 
     const getQuestions = async () => {
       setLoading(true);
       const data = await fetchQuestions();
-
       setQuestions(data);
       setLoading(false);
       return navigation(`${PATH.QUESTION}/0`);
     };
 
     getQuestions();
-  }, [setQuestions, questions?.length, navigation]);
+  }, [setQuestions, questions, navigation]);
 
   if (loading)
     return (
