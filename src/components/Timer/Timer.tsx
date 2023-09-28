@@ -1,21 +1,16 @@
 import { useState, useEffect, FC } from "react";
+import { CircularProgressbar, buildStyles } from "react-circular-progressbar";
 import { cn } from "@/utils/lib";
+
+import "react-circular-progressbar/dist/styles.css";
 
 type TimerProps = {
   time: number;
   onFinish: () => void;
   containerClass?: string;
-  innerContainerClass?: string;
-  timerClass?: string;
 };
 
-export const Timer: FC<TimerProps> = ({
-  time,
-  onFinish,
-  containerClass,
-  innerContainerClass,
-  timerClass,
-}) => {
+export const Timer: FC<TimerProps> = ({ time, onFinish, containerClass }) => {
   const [seconds, setSeconds] = useState(time);
 
   useEffect(() => {
@@ -30,15 +25,17 @@ export const Timer: FC<TimerProps> = ({
   }, [seconds, onFinish]);
 
   return (
-    <div className={cn("flex items-center justify-center", containerClass)}>
-      <div
-        className={cn(
-          "w-24 h-24 bg-gray-300 rounded-full flex items-center justify-center",
-          innerContainerClass
-        )}
-      >
-        <h1 className={cn("text-3xl font-bold", timerClass)}>{seconds}</h1>
-      </div>
+    <div
+      className={cn(
+        "flex items-center justify-center w-24 h-24",
+        containerClass
+      )}
+    >
+      <CircularProgressbar
+        value={(seconds / time) * 100}
+        text={`${seconds}`}
+        styles={buildStyles({ textSize: "1.5rem" })}
+      />
     </div>
   );
 };

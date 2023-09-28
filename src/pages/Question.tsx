@@ -4,8 +4,6 @@ import { PATH } from "@/utils/const";
 import { useEffect } from "react";
 import { Question as QuestionComponent } from "@/components/Question";
 
-// TODO: add modal showing You Are Correct!
-
 export const Question = () => {
   const { questions, setAnswers } = useDataStore();
   const navigate = useNavigate();
@@ -28,7 +26,7 @@ export const Question = () => {
   const onTimerFinished = (answer: string | undefined) => {
     const answerString = question.options[question.answer];
     setAnswers(String(questionId), {
-      answer: answer || "",
+      answer: answer || "Empty Answer",
       isCorrect: answer === answerString,
     });
   };
