@@ -35,13 +35,15 @@ export const DataStoreProvider = ({
     {}
   );
   const [currentQuestion, setCurrentQuestion] = useState<number>(0);
-  const answers = useRef<{ answer: string; isCorrect: boolean }[]>({});
+  const answers = useRef<{
+    [key: number | string]: { answer: string; isCorrect: boolean };
+  }>({});
 
   const onAnswersChange = (
-    id: number,
+    id: number | string,
     answer: { answer: string; isCorrect: boolean }
   ) => {
-    answers.current[id] = answer;
+    answers.current[id as number | string] = answer;
   };
 
   const onQuestionsChange = (newQuestions: { [key: number]: QuizQuestion }) => {
